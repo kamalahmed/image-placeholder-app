@@ -3,22 +3,40 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Image Upload</title>
+        <title>Placeholder Generator</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
         <link rel="stylesheet" href="/css/style.css" />
     </head>
     <body>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <h2>Upload Images</h2>
-            <div class="form-group">
-                <label>Select images to upload (PNG or JPEG):</label>
-                <input type="file" name="images" multiple />
-            </div>
-            <div class="form-group">
-                <label>Background Color:</label>
-                <input type="color" name="color" value="#808080" />
-            </div>
+        <div class="glass-effect container">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <h2>Placeholder Generator</h2>
 
-            <button type="submit">Upload and Generate Placeholders</button>
-        </form>
+                <div class="form-group">
+                    <label for="file-upload" class="custom-file-upload">
+                        Choose images (PNG or JPEG)
+                    </label>
+                    <input
+                        id="file-upload"
+                        type="file"
+                        name="images"
+                        multiple
+                        style="display: none"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label>Placeholder Background Color:</label>
+                    <input type="color" name="color" value="#808080" />
+                </div>
+
+                <button type="submit">Upload and Generate Placeholders</button>
+            </form>
+        </div>
     </body>
 </html>
