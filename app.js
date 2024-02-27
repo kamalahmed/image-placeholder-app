@@ -23,78 +23,76 @@ app.get("/", (req, res) => {
         <label>Background Color:</label>
         <input type="color" name="color" value="#808080">
       </div>
-      <div>
-        <label>Placeholder Text (optional):</label>
-        <input type="text" name="placeholderText">
-      </div>
       <button type="submit">Upload and Generate Placeholders</button>
     </form>
   `);
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-  const color = req.body.color || "#808080"; // Default color if none provided
-  const text = req.body.placeholderText || ""; // Default text if none provided
-  const output = fs.createWriteStream("placeholders.zip");
-  const archive = archiver("zip", {
-    zlib: { level: 9 }, // Compression level
-  });
+  // Extract color from form data, default to '#808080' if not provided
+  const customColor = req.body.color || "#808080";
 
-  output.on("close", function () {
-    console.log(archive.pointer() + " total bytes");
-    console.log(
-      "Archiver has been finalized and the output file descriptor has closed.",
-    );
+  const output = fs.createWriteStream("placeholders.zip");
+  const archive = archiver("zip", { zlib: { level: 9 } });
+
+  output.on("close", () => {
     res.download("placeholders.zip", "placeholders.zip", (err) => {
       if (err) {
         console.error("Error sending file", err);
       }
-      try {
-        fs.unlinkSync("placeholders.zip"); // Clean up zip file after sending
-      } catch (err) {
-        console.error("Error removing zip file", err);
-      }
+      fs.unlinkSync("placeholders.zip"); // Clean up zip file after sending
     });
   });
 
-  archive.on("error", function (err) {
+  archive.on("error", (err) => {
     throw err;
   });
 
   archive.pipe(output);
 
-  try {
-    for (const file of req.files) {
-      const metadata = await sharp(file.path).metadata();
-      const placeholder = await sharp({
-        create: {
-          width: metadata.width,
-          height: metadata.height,
-          channels: 4,
-          background: color,
-        },
-      })
-        .png()
+  for (const file of req.files) {
+    const metadata = await sharp(file.path).metadata();
+    const dimensionsText = `${metadata.width}p x ${metadata.height}p`;
+
+    // Calculate font size as 30% of image width
+    const fontSize = metadata.width * 0.1;
+    const svg = `
+      <svg width="${metadata.width}" height="${metadata.height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="${customColor}"/>
+        <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="${fontSize}px" fill="white">${dimensionsText}</text>
+      </svg>
+    `;
+
+    try {
+      const buffer = await sharp(Buffer.from(svg))
+        .toFormat(metadata.format)
         .toBuffer();
-
-      // You can optionally add placeholder text here if required
-
-      // Add the placeholder image to the archive
-      archive.append(placeholder, {
-        name: `${path.basename(file.originalname, path.extname(file.originalname))}.png`,
-      });
+      const sanitizedOriginalName = sanitizeFileName(
+        path.basename(file.originalname),
+      );
+      archive.append(buffer, { name: `${sanitizedOriginalName}` });
+    } catch (error) {
+      console.error("Error processing image:", error);
+      res.status(500).send("An error occurred while generating placeholders.");
+      return;
+    } finally {
+      fs.unlinkSync(file.path); // Cleanup the uploaded file
     }
-
-    // Finalize the archive (this will trigger the 'close' event on the output stream)
-    archive.finalize();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("An error occurred while generating placeholders.");
-  } finally {
-    // Cleanup uploaded files
-    req.files.forEach((file) => fs.unlinkSync(file.path));
   }
+
+  archive.finalize();
 });
+
+function sanitizeFileName(fileName) {
+  // Replace spaces with underscores
+  // let sanitized = fileName.replace(/\s+/g, "_");
+  // it is not good to change space if there is because we will use it in our html template to replace all images
+  // therefore same name needed. keeping above function for future option in the UI.
+
+  // Remove or replace other non-standard or special characters
+  // This regex removes anything that's not a letter, number, underscore, or dot.
+  return fileName.replace(/[^a-zA-Z0-9._-]/g, "");
+}
 
 app.listen(port, () =>
   console.log(`Server running on http://localhost:${port}`),
