@@ -10,3 +10,7 @@ Hi! This is a **node.js** app for **generating placeholder images** from the ima
 4. Then run `npm start`
 5. Then browse `http:localhost:3000` and upload your images
 6. You will get your images in a zip file to be downloaded after processing automatically.
+
+
+## This app is free to use.
+This app is free to use. If you do use it, then only a request that do not redistribute the code as if you own it. Rather share this repository link please and if possible then give this repository a star. Thank you :)
