@@ -12,20 +12,15 @@ const upload = multer({ dest: "uploads/" });
 
 // Serve HTML form at root
 app.get("/", (req, res) => {
-  res.send(`
-    <h2>Upload Images</h2>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-      <div>
-        <label>Select images to upload (PNG or JPEG):</label>
-        <input type="file" name="images" multiple>
-      </div>
-      <div>
-        <label>Background Color:</label>
-        <input type="color" name="color" value="#808080">
-      </div>
-      <button type="submit">Upload and Generate Placeholders</button>
-    </form>
-  `);
+  const indexPath = path.join(__dirname, "index.html"); // Adjust the path according to your file structure
+  fs.readFile(indexPath, "utf8", (err, html) => {
+    if (err) {
+      res.status(500).send("Sorry, something went wrong");
+      console.error(err);
+      return;
+    }
+    res.send(html);
+  });
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
@@ -91,7 +86,7 @@ function sanitizeFileName(fileName) {
 
   // Remove or replace other non-standard or special characters
   // This regex removes anything that's not a letter, number, underscore, or dot.
-  return fileName.replace(/[^a-zA-Z0-9._-]/g, "");
+  return fileName.replace(/[^a-zA-Z0-9._\s-]/g, "");
 }
 
 app.listen(port, () =>
