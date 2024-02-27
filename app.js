@@ -9,6 +9,8 @@ const port = 3000;
 
 // Configure multer for image uploads
 const upload = multer({ dest: "uploads/" });
+// Serve static files from the `public` directory
+app.use(express.static("public"));
 
 // Serve HTML form at root
 app.get("/", (req, res) => {
@@ -23,6 +25,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// handle image upload
 app.post("/upload", upload.array("images"), async (req, res) => {
   // Extract color from form data, default to '#808080' if not provided
   const customColor = req.body.color || "#808080";
