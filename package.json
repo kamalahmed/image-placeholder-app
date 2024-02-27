@@ -1,13 +1,18 @@
 {
   "name": "image-placeholder-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "This node js app helps you upload any number of images to generate placeholder version of them. It is useful for template developer in market place like themeforest where they need to submit placeholder versions of their stock images.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "image",
+    "placeholder",
+    "placeholder-generator",
+    "image-generator"
+  ],
+  "author": "Kamal Ahmed",
   "license": "ISC",
   "dependencies": {
     "archiver": "^6.0.1",
