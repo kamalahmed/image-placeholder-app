@@ -1,4 +1,4 @@
-
+![Application Preview](public/preview.png "App Preview")
 # Welcome to Image Placeholder Generator APP !
 
 Hi! This is a **node.js** app for **generating placeholder images** from the images that you upload. Suppose you want to submit your template on a online market place but you can not distrubute your images because of license issue. You can upload all of your image in this app then this app will generate placeholder images for all the original images. The placeholder images will maintain the *original image size* and also it will *print width and height* in pixel inside the image. So that your users can change them with proper image size.
